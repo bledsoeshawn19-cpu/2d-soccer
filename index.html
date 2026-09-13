@@ -3,102 +3,138 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Penalty Master</title>
+  <title>Realistic Penalty Shootout</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <main class="game">
-    <header class="topbar">
+  <div class="game-container">
+
+    <header class="header">
       <div>
-        <h1>⚽ Penalty Master</h1>
-        <p>Beat the goalkeeper and score!</p>
+        <h1>Penalty Shootout</h1>
+        <p>Read the goalkeeper and find the corner.</p>
       </div>
 
       <div class="scoreboard">
         <div>
           <span>GOALS</span>
-          <strong id="goals">0</strong>
+          <b id="goals">0</b>
         </div>
+
         <div>
           <span>SAVES</span>
-          <strong id="saves">0</strong>
+          <b id="saves">0</b>
         </div>
+
         <div>
           <span>SHOTS</span>
-          <strong id="shots">0</strong>
+          <b id="shots">0</b>
         </div>
       </div>
     </header>
 
     <section class="stadium">
-      <div class="crowd"></div>
-      <div class="stadium-lights"></div>
+
+      <div class="stands">
+        <div class="stand-row"></div>
+        <div class="stand-row second"></div>
+        <div class="advertising">
+          <span>CHAMPIONS</span>
+          <span>FOOTBALL</span>
+          <span>SPORTS</span>
+          <span>STADIUM</span>
+        </div>
+      </div>
 
       <div class="field">
-        <div class="field-line halfway"></div>
-        <div class="penalty-box"></div>
-        <div class="goal-box"></div>
+
+        <div class="field-stripes"></div>
+
+        <div class="penalty-area"></div>
+        <div class="six-yard-box"></div>
+        <div class="penalty-arc"></div>
         <div class="penalty-spot"></div>
 
         <div class="goal">
-          <div class="goal-top"></div>
-          <div class="net"></div>
+          <div class="goal-frame top-frame"></div>
+          <div class="goal-frame left-frame"></div>
+          <div class="goal-frame right-frame"></div>
+          <div class="goal-frame bottom-frame"></div>
+
+          <div class="net-back"></div>
+          <div class="net-side left-net"></div>
+          <div class="net-side right-net"></div>
+          <div class="net-roof"></div>
 
           <div id="keeper" class="keeper">
             <div class="keeper-head"></div>
+
+            <div class="keeper-neck"></div>
+
             <div class="keeper-body">
-              <div class="keeper-number">1</div>
+              <div class="jersey-number">1</div>
+              <div class="jersey-logo"></div>
             </div>
-            <div class="keeper-arm left-arm"></div>
-            <div class="keeper-arm right-arm"></div>
+
+            <div class="keeper-arm left-arm">
+              <div class="glove"></div>
+            </div>
+
+            <div class="keeper-arm right-arm">
+              <div class="glove"></div>
+            </div>
+
             <div class="keeper-leg left-leg"></div>
             <div class="keeper-leg right-leg"></div>
+
+            <div class="keeper-boot left-boot"></div>
+            <div class="keeper-boot right-boot"></div>
           </div>
         </div>
 
+        <div id="target" class="target">+</div>
+        <div id="aimLine" class="aim-line"></div>
+
         <div id="ball" class="ball">
-          <div class="ball-pattern"></div>
+          <div class="ball-panel"></div>
         </div>
 
-        <div id="aimLine" class="aim-line"></div>
-        <div id="target" class="target">+</div>
       </div>
     </section>
 
     <section class="controls">
-      <div class="power-section">
-        <div class="control-title">
-          <span>SHOT POWER</span>
-          <strong id="powerText">50%</strong>
-        </div>
 
-        <input
-          id="power"
-          type="range"
-          min="15"
-          max="100"
-          value="50"
-        >
+      <div class="control-heading">
+        <span>SHOT POWER</span>
+        <strong id="powerText">55%</strong>
       </div>
 
-      <div class="control-title">
-        <span>AIM</span>
+      <input id="power" type="range" min="20" max="100" value="55">
+
+      <div class="control-heading aim-heading">
+        <span>AIMING</span>
         <strong id="aimText">CENTER</strong>
       </div>
 
       <div class="aim-buttons">
-        <button data-aim="left">LEFT</button>
+        <button data-aim="left">LEFT CORNER</button>
         <button data-aim="center" class="active">CENTER</button>
-        <button data-aim="right">RIGHT</button>
+        <button data-aim="right">RIGHT CORNER</button>
       </div>
 
-      <button id="shootBtn" class="shoot-button">SHOOT ⚽</button>
-      <button id="resetBtn" class="reset-button">RESET GAME</button>
+      <button id="shootBtn" class="shoot-button">
+        SHOOT
+      </button>
 
-      <p id="message" class="message">Choose your aim and power!</p>
+      <button id="resetBtn" class="reset-button">
+        RESET GAME
+      </button>
+
+      <p id="message">Choose your aim and power.</p>
+
     </section>
-  </main>
+  </div>
 
   <script src="script.js"></script>
 </body>
