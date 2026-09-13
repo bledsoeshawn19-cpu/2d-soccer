@@ -18,7 +18,7 @@ let goals = 0;
 let saves = 0;
 let shots = 0;
 let selectedAim = "center";
-let isShooting = false;
+let shooting = false;
 
 const aimPositions = {
   left: 25,
@@ -36,13 +36,13 @@ function updateAim() {
   target.style.left = `${position}%`;
 
   if (selectedAim === "left") {
-    aimText.textContent = "LEFT";
+    aimText.textContent = "LEFT CORNER";
     aimLine.style.transform =
-      "translateX(-50%) rotate(-18deg)";
+      "translateX(-50%) rotate(-19deg)";
   } else if (selectedAim === "right") {
-    aimText.textContent = "RIGHT";
+    aimText.textContent = "RIGHT CORNER";
     aimLine.style.transform =
-      "translateX(-50%) rotate(18deg)";
+      "translateX(-50%) rotate(19deg)";
   } else {
     aimText.textContent = "CENTER";
     aimLine.style.transform =
@@ -64,122 +64,126 @@ function chooseAim(aim) {
   updateAim();
 }
 
-function moveKeeper() {
+function chooseKeeperDirection() {
   const random = Math.random();
 
-  if (random < 0.33) {
-    return "left";
-  }
-
-  if (random < 0.66) {
-    return "center";
-  }
-
+  if (random < 0.34) return "left";
+  if (random < 0.67) return "center";
   return "right";
 }
 
-function keeperPositionFor(direction) {
-  if (direction === "left") return 22;
-  if (direction === "right") return 78;
+function getKeeperPosition(direction) {
+  if (direction === "left") return 23;
+  if (direction === "right") return 77;
   return 50;
 }
 
 function makeKeeperDive(direction) {
-  const position = keeperPositionFor(direction);
+  const position = getKeeperPosition(direction);
 
-  keeper.style.left = `calc(${position}% - 25px)`;
+  keeper.style.left = `calc(${position}% - 27px)`;
 
   if (direction === "left") {
-    keeper.style.transform = "rotate(-55deg) translateY(-5px)";
+    keeper.style.transform =
+      "rotate(-58deg) translate(-8px, -5px) scale(1.04)";
   } else if (direction === "right") {
-    keeper.style.transform = "rotate(55deg) translateY(-5px)";
+    keeper.style.transform =
+      "rotate(58deg) translate(8px, -5px) scale(1.04)";
   } else {
-    keeper.style.transform = "scale(1.12)";
+    keeper.style.transform = "scale(1.08)";
   }
 }
 
-function shootBall() {
-  if (isShooting) return;
+function resetBallAndKeeper() {
+  ball.style.left = "calc(50% - 14px)";
+  ball.style.bottom = "72px";
+  ball.style.transform = "rotate(0deg) scale(1)";
 
-  isShooting = true;
+  keeper.style.left = "calc(50% - 27px)";
+  keeper.style.transform = "rotate(0deg) scale(1)";
+}
+
+function shootBall() {
+  if (shooting) return;
+
+  shooting = true;
   shootBtn.disabled = true;
 
   shots++;
   shotsDisplay.textContent = shots;
 
   const power = Number(powerSlider.value);
-  const aimPosition = aimPositions[selectedAim];
+  const targetPosition = aimPositions[selectedAim];
 
-  const keeperDirection = moveKeeper();
-  const keeperPosition = keeperPositionFor(keeperDirection);
+  const keeperDirection = chooseKeeperDirection();
+  const keeperPosition = getKeeperPosition(keeperDirection);
 
-  const aimDifference = Math.abs(aimPosition - keeperPosition);
+  const distanceFromKeeper =
+    Math.abs(targetPosition - keeperPosition);
 
   /*
-    Higher power makes the shot faster and slightly harder
-    for the goalkeeper to save.
+    Shots aimed close to the keeper are easier to save.
+    High power slightly reduces the save chance.
   */
-  const saveChance =
-    aimDifference < 12
-      ? Math.max(0.2, 0.82 - power / 180)
-      : aimDifference < 28
-        ? 0.25
-        : 0.08;
+  let saveChance;
+
+  if (distanceFromKeeper < 12) {
+    saveChance = 0.78 - power / 230;
+  } else if (distanceFromKeeper < 28) {
+    saveChance = 0.34 - power / 400;
+  } else {
+    saveChance = 0.08;
+  }
+
+  saveChance = Math.max(0.04, Math.min(0.85, saveChance));
 
   const saved = Math.random() < saveChance;
 
   makeKeeperDive(keeperDirection);
 
-  const ballTargetX =
-    aimPosition + (Math.random() * 6 - 3);
+  const randomAccuracy = Math.random() * 5 - 2.5;
+  const finalTarget = targetPosition + randomAccuracy;
 
-  const ballHeight =
-    125 + power * 0.65;
+  const ballHeight = 155 + power * 0.75;
 
-  ball.style.left = `calc(${ballTargetX}% - 13px)`;
+  ball.style.left = `calc(${finalTarget}% - 14px)`;
   ball.style.bottom = `${ballHeight}px`;
 
   if (selectedAim === "left") {
-    ball.style.transform = "rotate(-720deg) scale(1.15)";
+    ball.style.transform =
+      "rotate(-900deg) scale(1.12)";
   } else if (selectedAim === "right") {
-    ball.style.transform = "rotate(720deg) scale(1.15)";
+    ball.style.transform =
+      "rotate(900deg) scale(1.12)";
   } else {
-    ball.style.transform = "rotate(540deg) scale(1.15)";
+    ball.style.transform =
+      "rotate(650deg) scale(1.12)";
   }
 
   setTimeout(() => {
     if (saved) {
       saves++;
       savesDisplay.textContent = saves;
-      message.textContent = "🧤 SAVED! The goalkeeper got it!";
-      message.style.color = "#ff6b6b";
+      message.textContent = "🧤 SAVED! Great goalkeeping!";
+      message.style.color = "#ff7777";
     } else {
       goals++;
       goalsDisplay.textContent = goals;
-      message.textContent = "⚽ GOAL! What a finish!";
-      message.style.color = "#55f28b";
+      message.textContent = "⚽ GOAL! Into the corner!";
+      message.style.color = "#55ef91";
     }
-  }, 550);
+  }, 560);
 
   setTimeout(() => {
-    resetBall();
-  }, 1300);
-}
-
-function resetBall() {
-  ball.style.left = "calc(50% - 13px)";
-  ball.style.bottom = "48px";
-  ball.style.transform = "rotate(0deg) scale(1)";
-
-  keeper.style.left = "calc(50% - 25px)";
-  keeper.style.transform = "rotate(0deg) scale(1)";
+    resetBallAndKeeper();
+  }, 1350);
 
   setTimeout(() => {
-    isShooting = false;
+    shooting = false;
     shootBtn.disabled = false;
-    message.textContent = "Choose your aim and power!";
-    message.style.color = "#ffdf32";
-  }, 350);
+    message.textContent = "Choose your aim and power.";
+    message.style.color = "#ffdb2f";
+  }, 1750);
 }
 
 function resetGame() {
@@ -191,7 +195,13 @@ function resetGame() {
   savesDisplay.textContent = "0";
   shotsDisplay.textContent = "0";
 
-  resetBall();
+  resetBallAndKeeper();
+
+  shooting = false;
+  shootBtn.disabled = false;
+
+  message.textContent = "Choose your aim and power.";
+  message.style.color = "#ffdb2f";
 }
 
 powerSlider.addEventListener("input", updatePower);
