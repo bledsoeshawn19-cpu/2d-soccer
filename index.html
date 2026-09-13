@@ -9,86 +9,95 @@
 <body>
 
   <main class="game">
-    <h1>⚽ PENALTY MASTER</h1>
-    <p class="subtitle">Choose your shot and beat the goalkeeper!</p>
-
-    <div class="scoreboard">
-      <span>Goals: <b id="goals">0</b></span>
-      <span>Saves: <b id="saves">0</b></span>
-      <span>Shots: <b id="shots">0</b></span>
-      <span>Streak: <b id="streak">0</b></span>
-    </div>
-
-    <section class="field">
-      <div class="goal">
-        <div class="net"></div>
-        <div id="keeper" class="keeper"></div>
+    <header class="topbar">
+      <div>
+        <h1>⚽ Penalty Master</h1>
+        <p>Beat the goalkeeper and score!</p>
       </div>
 
-      <div id="target" class="target">TARGET</div>
-      <div id="ball" class="ball">⚽</div>
-      <div id="message" class="message">Choose your shot!</div>
+      <div class="scoreboard">
+        <div>
+          <span>GOALS</span>
+          <strong id="goals">0</strong>
+        </div>
+        <div>
+          <span>SAVES</span>
+          <strong id="saves">0</strong>
+        </div>
+        <div>
+          <span>SHOTS</span>
+          <strong id="shots">0</strong>
+        </div>
+      </div>
+    </header>
+
+    <section class="stadium">
+      <div class="crowd"></div>
+      <div class="stadium-lights"></div>
+
+      <div class="field">
+        <div class="field-line halfway"></div>
+        <div class="penalty-box"></div>
+        <div class="goal-box"></div>
+        <div class="penalty-spot"></div>
+
+        <div class="goal">
+          <div class="goal-top"></div>
+          <div class="net"></div>
+
+          <div id="keeper" class="keeper">
+            <div class="keeper-head"></div>
+            <div class="keeper-body">
+              <div class="keeper-number">1</div>
+            </div>
+            <div class="keeper-arm left-arm"></div>
+            <div class="keeper-arm right-arm"></div>
+            <div class="keeper-leg left-leg"></div>
+            <div class="keeper-leg right-leg"></div>
+          </div>
+        </div>
+
+        <div id="ball" class="ball">
+          <div class="ball-pattern"></div>
+        </div>
+
+        <div id="aimLine" class="aim-line"></div>
+        <div id="target" class="target">+</div>
+      </div>
     </section>
 
     <section class="controls">
-      <label>
-        Aim
-        <input id="aim" type="range" min="10" max="90" value="50">
-      </label>
+      <div class="power-section">
+        <div class="control-title">
+          <span>SHOT POWER</span>
+          <strong id="powerText">50%</strong>
+        </div>
 
-      <label>
-        Power
-        <input id="power" type="range" min="20" max="100" value="70">
-      </label>
+        <input
+          id="power"
+          type="range"
+          min="15"
+          max="100"
+          value="50"
+        >
+      </div>
 
-      <label>
-        Curve
-        <input id="curve" type="range" min="-30" max="30" value="0">
-      </label>
+      <div class="control-title">
+        <span>AIM</span>
+        <strong id="aimText">CENTER</strong>
+      </div>
 
-      <label>
-        Difficulty
-        <select id="difficulty">
-          <option value="easy">Easy</option>
-          <option value="normal" selected>Normal</option>
-          <option value="hard">Hard</option>
-        </select>
-      </label>
+      <div class="aim-buttons">
+        <button data-aim="left">LEFT</button>
+        <button data-aim="center" class="active">CENTER</button>
+        <button data-aim="right">RIGHT</button>
+      </div>
+
+      <button id="shootBtn" class="shoot-button">SHOOT ⚽</button>
+      <button id="resetBtn" class="reset-button">RESET GAME</button>
+
+      <p id="message" class="message">Choose your aim and power!</p>
     </section>
-
-    <section class="shot-types">
-      <button class="shot-button active" data-shot="normal">
-        Normal Shot
-      </button>
-
-      <button class="shot-button" data-shot="power">
-        Power Shot
-      </button>
-
-      <button class="shot-button" data-shot="finesse">
-        Finesse Shot
-      </button>
-
-      <button class="shot-button" data-shot="chip">
-        Chip Shot
-      </button>
-
-      <button class="shot-button" data-shot="knuckle">
-        Knuckleball
-      </button>
-    </section>
-
-    <div class="actions">
-      <button id="shootButton" class="shoot-button">SHOOT ⚡</button>
-      <button id="resetButton" class="reset-button">RESET</button>
-    </div>
-
-    <div class="shot-info">
-      <h2 id="shotName">Normal Shot</h2>
-      <p id="shotDescription">
-        A balanced shot with average power, accuracy, and curve.
-      </p>
-    </div>
   </main>
 
   <script src="script.js"></script>
