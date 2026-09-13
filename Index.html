@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Penalty Master</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="game">
+    <h1>⚽ PENALTY MASTER</h1>
+    <p class="subtitle">Beat the goalkeeper with skill and accuracy!</p>
+
+    <div class="scoreboard">
+      <span>Goals: <b id="goals">0</b></span>
+      <span>Saves: <b id="saves">0</b></span>
+      <span>Shots: <b id="shots">0</b></span>
+    </div>
+
+    <div class="field">
+      <div class="goal">
+        <div class="net"></div>
+        <div id="keeper" class="keeper"></div>
+      </div>
+
+      <div id="ball" class="ball">⚽</div>
+      <div id="message" class="message">Choose where to shoot!</div>
+    </div>
+
+    <div class="controls">
+      <label>
+        Aim:
+        <input id="aim" type="range" min="10" max="90" value="50">
+      </label>
+
+      <label>
+        Power:
+        <input id="power" type="range" min="20" max="100" value="70">
+      </label>
+
+      <label>
+        Curve:
+        <input id="curve" type="range" min="-30" max="30" value="0">
+      </label>
+
+      <button id="shootButton">SHOOT ⚡</button>
+      <button id="resetButton">RESET</button>
+    </div>
+
+    <div class="instructions">
+      <p><b>Aim:</b> Left to right</p>
+      <p><b>Power:</b> Weak to powerful</p>
+      <p><b>Curve:</b> Bend the ball left or right</p>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
