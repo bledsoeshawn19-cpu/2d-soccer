@@ -1,245 +1,209 @@
-const ball = document.getElementById("ball");
 const keeper = document.getElementById("keeper");
+const ball = document.getElementById("ball");
 const target = document.getElementById("target");
+const aimLine = document.getElementById("aimLine");
+
+const powerSlider = document.getElementById("power");
+const powerText = document.getElementById("powerText");
+const aimText = document.getElementById("aimText");
+const shootBtn = document.getElementById("shootBtn");
+const resetBtn = document.getElementById("resetBtn");
 const message = document.getElementById("message");
 
-const aimSlider = document.getElementById("aim");
-const powerSlider = document.getElementById("power");
-const curveSlider = document.getElementById("curve");
-const difficultySelect = document.getElementById("difficulty");
-
-const shootButton = document.getElementById("shootButton");
-const resetButton = document.getElementById("resetButton");
-
-const goalsText = document.getElementById("goals");
-const savesText = document.getElementById("saves");
-const shotsText = document.getElementById("shots");
-const streakText = document.getElementById("streak");
-
-const shotName = document.getElementById("shotName");
-const shotDescription = document.getElementById("shotDescription");
-
-const shotButtons = document.querySelectorAll(".shot-button");
+const goalsDisplay = document.getElementById("goals");
+const savesDisplay = document.getElementById("saves");
+const shotsDisplay = document.getElementById("shots");
 
 let goals = 0;
 let saves = 0;
 let shots = 0;
-let streak = 0;
-let shooting = false;
-let selectedShot = "normal";
+let selectedAim = "center";
+let isShooting = false;
 
-const shotTypes = {
-  normal: {
-    name: "Normal Shot",
-    description: "A balanced shot with average power, accuracy, and curve.",
-    accuracy: 1,
-    power: 1,
-    curve: 1,
-    height: 0,
-    spin: 0
-  },
-
-  power: {
-    name: "Power Shot",
-    description: "Very fast and difficult to stop, but less accurate.",
-    accuracy: 0.72,
-    power: 1.35,
-    curve: 0.4,
-    height: 5,
-    spin: 0
-  },
-
-  finesse: {
-    name: "Finesse Shot",
-    description: "A controlled curling shot designed for the corners.",
-    accuracy: 1.15,
-    power: 0.85,
-    curve: 1.8,
-    height: 10,
-    spin: 1
-  },
-
-  chip: {
-    name: "Chip Shot",
-    description: "Lifts the ball over the goalkeeper.",
-    accuracy: 0.9,
-    power: 0.7,
-    curve: 0.5,
-    height: 55,
-    spin: 0
-  },
-
-  knuckle: {
-    name: "Knuckleball",
-    description: "A strange shot with unpredictable movement.",
-    accuracy: 0.82,
-    power: 1.1,
-    curve: 1.2,
-    height: 20,
-    spin: 2
-  }
+const aimPositions = {
+  left: 25,
+  center: 50,
+  right: 75
 };
 
-shotButtons.forEach(button => {
-  button.addEventListener("click", () => {
-    selectedShot = button.dataset.shot;
+function updatePower() {
+  powerText.textContent = `${powerSlider.value}%`;
+}
 
-    shotButtons.forEach(btn => {
-      btn.classList.remove("active");
-    });
+function updateAim() {
+  const position = aimPositions[selectedAim];
 
-    button.classList.add("active");
+  target.style.left = `${position}%`;
 
-    const shot = shotTypes[selectedShot];
-    shotName.textContent = shot.name;
-    shotDescription.textContent = shot.description;
+  if (selectedAim === "left") {
+    aimText.textContent = "LEFT";
+    aimLine.style.transform =
+      "translateX(-50%) rotate(-18deg)";
+  } else if (selectedAim === "right") {
+    aimText.textContent = "RIGHT";
+    aimLine.style.transform =
+      "translateX(-50%) rotate(18deg)";
+  } else {
+    aimText.textContent = "CENTER";
+    aimLine.style.transform =
+      "translateX(-50%) rotate(0deg)";
+  }
+}
+
+function chooseAim(aim) {
+  selectedAim = aim;
+
+  document.querySelectorAll(".aim-buttons button").forEach(button => {
+    button.classList.remove("active");
   });
-});
 
-shootButton.addEventListener("click", shoot);
-resetButton.addEventListener("click", resetGame);
+  document
+    .querySelector(`[data-aim="${aim}"]`)
+    .classList.add("active");
 
-function shoot() {
-  if (shooting) return;
+  updateAim();
+}
 
-  shooting = true;
+function moveKeeper() {
+  const random = Math.random();
 
-  const shot = shotTypes[selectedShot];
-  const aim = Number(aimSlider.value);
-  const power = Number(powerSlider.value);
-  const curve = Number(curveSlider.value);
-  const difficulty = difficultySelect.value;
+  if (random < 0.33) {
+    return "left";
+  }
+
+  if (random < 0.66) {
+    return "center";
+  }
+
+  return "right";
+}
+
+function keeperPositionFor(direction) {
+  if (direction === "left") return 22;
+  if (direction === "right") return 78;
+  return 50;
+}
+
+function makeKeeperDive(direction) {
+  const position = keeperPositionFor(direction);
+
+  keeper.style.left = `calc(${position}% - 25px)`;
+
+  if (direction === "left") {
+    keeper.style.transform = "rotate(-55deg) translateY(-5px)";
+  } else if (direction === "right") {
+    keeper.style.transform = "rotate(55deg) translateY(-5px)";
+  } else {
+    keeper.style.transform = "scale(1.12)";
+  }
+}
+
+function shootBall() {
+  if (isShooting) return;
+
+  isShooting = true;
+  shootBtn.disabled = true;
 
   shots++;
-  shotsText.textContent = shots;
+  shotsDisplay.textContent = shots;
 
-  let difficultyMultiplier = 1;
+  const power = Number(powerSlider.value);
+  const aimPosition = aimPositions[selectedAim];
 
-  if (difficulty === "easy") {
-    difficultyMultiplier = 0.65;
-  } else if (difficulty === "hard") {
-    difficultyMultiplier = 1.35;
-  }
+  const keeperDirection = moveKeeper();
+  const keeperPosition = keeperPositionFor(keeperDirection);
 
-  let finalAim = aim + curve * shot.curve * 0.35;
+  const aimDifference = Math.abs(aimPosition - keeperPosition);
 
-  if (selectedShot === "knuckle") {
-    finalAim += (Math.random() - 0.5) * 18;
-  }
+  /*
+    Higher power makes the shot faster and slightly harder
+    for the goalkeeper to save.
+  */
+  const saveChance =
+    aimDifference < 12
+      ? Math.max(0.2, 0.82 - power / 180)
+      : aimDifference < 28
+        ? 0.25
+        : 0.08;
 
-  finalAim = Math.max(8, Math.min(92, finalAim));
+  const saved = Math.random() < saveChance;
 
-  const keeperPosition =
-    Math.random() * 75 + 12.5;
+  makeKeeperDive(keeperDirection);
 
-  const distanceFromKeeper =
-    Math.abs(finalAim - keeperPosition);
+  const ballTargetX =
+    aimPosition + (Math.random() * 6 - 3);
 
-  const powerDifficulty =
-    power > 90 ? 8 : 0;
+  const ballHeight =
+    125 + power * 0.65;
 
-  const shotAccuracyPenalty =
-    (1 - shot.accuracy) * 22 * difficultyMultiplier;
+  ball.style.left = `calc(${ballTargetX}% - 13px)`;
+  ball.style.bottom = `${ballHeight}px`;
 
-  const saveZone =
-    9 +
-    shotAccuracyPenalty +
-    powerDifficulty;
-
-  const chipBonus =
-    selectedShot === "chip" ? 18 : 0;
-
-  const keeperReaction =
-    Math.random() * 25 * difficultyMultiplier;
-
-  const saved =
-    distanceFromKeeper < saveZone + keeperReaction / 4 - chipBonus;
-
-  let targetHeight = 260 + shot.height + power * shot.power * 0.8;
-
-  if (selectedShot === "chip") {
-    targetHeight += 70;
-  }
-
-  ball.style.left = `calc(${finalAim}% - 22px)`;
-  ball.style.bottom = `${targetHeight}px`;
-
-  let rotation = curve * 7 * shot.curve;
-
-  if (selectedShot === "knuckle") {
-    rotation += (Math.random() - 0.5) * 100;
-  }
-
-  ball.style.transform =
-    `rotate(${rotation}deg)`;
-
-  keeper.style.left =
-    `calc(${keeperPosition}% - 24px)`;
-
-  if (saved) {
-    keeper.style.transform =
-      `rotate(${finalAim > keeperPosition ? 25 : -25}deg)`;
+  if (selectedAim === "left") {
+    ball.style.transform = "rotate(-720deg) scale(1.15)";
+  } else if (selectedAim === "right") {
+    ball.style.transform = "rotate(720deg) scale(1.15)";
   } else {
-    keeper.style.transform = "scale(1.1)";
+    ball.style.transform = "rotate(540deg) scale(1.15)";
   }
 
   setTimeout(() => {
     if (saved) {
       saves++;
-      streak = 0;
-
-      savesText.textContent = saves;
-      streakText.textContent = streak;
-
-      message.textContent =
-        selectedShot === "chip"
-          ? "🧤 SAVED! The goalkeeper caught your chip!"
-          : "🧤 SAVED! The goalkeeper made a great stop!";
-
-      message.style.color = "#ff5555";
+      savesDisplay.textContent = saves;
+      message.textContent = "🧤 SAVED! The goalkeeper got it!";
+      message.style.color = "#ff6b6b";
     } else {
       goals++;
-      streak++;
-
-      goalsText.textContent = goals;
-      streakText.textContent = streak;
-
-      message.textContent =
-        streak >= 3
-          ? `🔥 ${streak} GOALS IN A ROW!`
-          : "⚽ GOOOOAL! What a finish!";
-
-      message.style.color = "#58ff8b";
+      goalsDisplay.textContent = goals;
+      message.textContent = "⚽ GOAL! What a finish!";
+      message.style.color = "#55f28b";
     }
+  }, 550);
 
-    setTimeout(resetBall, 1300);
-  }, 700);
+  setTimeout(() => {
+    resetBall();
+  }, 1300);
 }
 
 function resetBall() {
-  ball.style.left = "calc(50% - 22px)";
-  ball.style.bottom = "35px";
-  ball.style.transform = "rotate(0deg)";
+  ball.style.left = "calc(50% - 13px)";
+  ball.style.bottom = "48px";
+  ball.style.transform = "rotate(0deg) scale(1)";
 
-  keeper.style.left = "calc(50% - 24px)";
+  keeper.style.left = "calc(50% - 25px)";
   keeper.style.transform = "rotate(0deg) scale(1)";
 
-  shooting = false;
+  setTimeout(() => {
+    isShooting = false;
+    shootBtn.disabled = false;
+    message.textContent = "Choose your aim and power!";
+    message.style.color = "#ffdf32";
+  }, 350);
 }
 
 function resetGame() {
   goals = 0;
   saves = 0;
   shots = 0;
-  streak = 0;
 
-  goalsText.textContent = "0";
-  savesText.textContent = "0";
-  shotsText.textContent = "0";
-  streakText.textContent = "0";
-
-  message.textContent = "Choose your shot!";
-  message.style.color = "white";
+  goalsDisplay.textContent = "0";
+  savesDisplay.textContent = "0";
+  shotsDisplay.textContent = "0";
 
   resetBall();
 }
+
+powerSlider.addEventListener("input", updatePower);
+
+document.querySelectorAll(".aim-buttons button").forEach(button => {
+  button.addEventListener("click", () => {
+    chooseAim(button.dataset.aim);
+  });
+});
+
+shootBtn.addEventListener("click", shootBall);
+resetBtn.addEventListener("click", resetGame);
+
+updatePower();
+updateAim();
